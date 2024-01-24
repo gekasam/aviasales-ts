@@ -1,0 +1,13 @@
+.ticket-list {
+  display: flex;
+  flex-direction: column;
+  padding: 2rem 0 2rem 0;
+  gap: 2rem;
+}
+
+.ticket-list__item {
+  background-color: #ffffff;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  box-shadow: 0 0.2rem 0.8rem 0 rgba(0, 0, 0, 0.1);
+}
