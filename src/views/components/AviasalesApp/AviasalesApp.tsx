@@ -7,20 +7,6 @@ import logo from '/src/assets/images/Logo.svg';
 
 import classes from './AviasalesApp.module.scss';
 
-type Obj = {
-  a: number;
-  b: string;
-  [key: string]: string | number;
-};
-
-const o: Obj = {
-  a: 1,
-  b: 'a',
-  d: 7,
-};
-
-console.log(o);
-
 export default function AviasalesApp() {
   return (
     <div className={classes['app-wrapper']}>

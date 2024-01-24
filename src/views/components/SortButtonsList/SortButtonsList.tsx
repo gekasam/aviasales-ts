@@ -1,19 +1,19 @@
 import classNames from 'classnames';
-import { useState } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+
+import type { RootState } from '../../../store/store';
+import { cheap, fast, optimal } from '../../../store/sortSlice';
 
 import classes from './SortButtonsList.module.scss';
 
 export default function SortButtonsList() {
-  const [sortActive, setSortActive] = useState('cheap');
+  const sort = useSelector((state: RootState) => state.sortReducer.sortValue);
+  const dispatch = useDispatch();
 
   const buttonSortClasses = (value: string) =>
     classNames(classes['button-sort'], {
-      [classes['button-sort--active']]: sortActive === value,
+      [classes['button-sort--active']]: sort === value,
     });
-
-  const handleChangeSort = (value: string) => {
-    setSortActive(value);
-  };
 
   return (
     <ul className={classes['sort-list']}>
@@ -22,7 +22,7 @@ export default function SortButtonsList() {
           type="button"
           value="cheap"
           className={buttonSortClasses('cheap')}
-          onClick={() => handleChangeSort('cheap')}
+          onClick={() => dispatch(cheap())}
         >
           САМЫЙ ДЕШЁВЫЙ
         </button>
@@ -31,7 +31,7 @@ export default function SortButtonsList() {
         <button
           type="button"
           className={buttonSortClasses('fast')}
-          onClick={() => handleChangeSort('fast')}
+          onClick={() => dispatch(fast())}
         >
           САМЫЙ БЫСТРЫЙ
         </button>
@@ -40,7 +40,7 @@ export default function SortButtonsList() {
         <button
           type="button"
           className={buttonSortClasses('optimal')}
-          onClick={() => handleChangeSort('optimal')}
+          onClick={() => dispatch(optimal())}
         >
           ОПТИМАЛНЫЙ
         </button>
