@@ -34,7 +34,6 @@ module.exports = {
     'react/prop-types': 0,
     'import/no-absolute-path': 'off',
     'import/no-unresolved': [2, { caseSensitive: false }],
-    "react/self-closing-comp": "off",
     'react/jsx-filename-extension': [1, { extensions: ['.js', '.jsx'] }],
     'jsx-a11y/label-has-associated-control': [
       2,
