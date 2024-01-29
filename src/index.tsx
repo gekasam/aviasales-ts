@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom/client';
 import { Provider } from 'react-redux';
 
 import store from './store';
-import AviasalesApp from './views/components/AviasalesApp';
+import AviasalesApp from './components/AviasalesApp';
 import './assets/fonts/fonts.scss';
 import './base/reset.scss';
 

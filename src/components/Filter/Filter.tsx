@@ -1,13 +1,11 @@
-import { useSelector, useDispatch } from 'react-redux';
-
-import { all, without, one, two, three } from '../../../store/filterSlice';
-import type { RootState } from '../../../store/store';
+import { useAppSelector, useAppDispatch } from '../../hooks';
+import { all, without, one, two, three } from '../../store/filterSlice';
 
 import classes from './Filter.module.scss';
 
 export default function Filter() {
-  const filter = useSelector((state: RootState) => state.filterReducer);
-  const dispatch = useDispatch();
+  const filter = useAppSelector((state) => state.filterReducer);
+  const dispatch = useAppDispatch();
 
   return (
     <div className={classes.filter}>

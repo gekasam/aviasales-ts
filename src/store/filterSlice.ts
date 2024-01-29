@@ -22,33 +22,26 @@ const filterSlice = createSlice({
   reducers: {
     all: (state) => {
       state.all = !state.all;
-      if (state.all) {
-        state.without = true;
-        state.one = true;
-        state.two = true;
-        state.three = true;
-      } else {
-        state.without = false;
-        state.one = false;
-        state.two = false;
-        state.three = false;
-      }
+      state.without = state.all;
+      state.one = state.all;
+      state.two = state.all;
+      state.three = state.all;
     },
     without: (state) => {
       state.without = !state.without;
-      state.all = Boolean(+state.without * +state.one * +state.two * +state.three);
+      state.all = state.without && state.one && state.two && state.three;
     },
     one: (state) => {
       state.one = !state.one;
-      state.all = Boolean(+state.without * +state.one * +state.two * +state.three);
+      state.all = state.without && state.one && state.two && state.three;
     },
     two: (state) => {
       state.two = !state.two;
-      state.all = Boolean(+state.without * +state.one * +state.two * +state.three);
+      state.all = state.without && state.one && state.two && state.three;
     },
     three: (state) => {
       state.three = !state.three;
-      state.all = Boolean(+state.without * +state.one * +state.two * +state.three);
+      state.all = state.without && state.one && state.two && state.three;
     },
   },
 });

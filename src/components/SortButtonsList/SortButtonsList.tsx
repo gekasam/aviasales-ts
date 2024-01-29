@@ -1,14 +1,13 @@
 import classNames from 'classnames';
-import { useSelector, useDispatch } from 'react-redux';
 
-import type { RootState } from '../../../store/store';
-import { cheap, fast, optimal } from '../../../store/sortSlice';
+import { useAppSelector, useAppDispatch } from '../../hooks';
+import { cheap, fast, optimal } from '../../store/sortSlice';
 
 import classes from './SortButtonsList.module.scss';
 
 export default function SortButtonsList() {
-  const sort = useSelector((state: RootState) => state.sortReducer.sortValue);
-  const dispatch = useDispatch();
+  const sort = useAppSelector((state) => state.sortReducer.sortValue);
+  const dispatch = useAppDispatch();
 
   const buttonSortClasses = (value: string) =>
     classNames(classes['button-sort'], {
