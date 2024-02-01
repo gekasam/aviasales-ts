@@ -4,34 +4,39 @@ import type { TicketData } from '../components/Ticket/Ticket';
 
 export type TicketsList = {
   renderedTickets: TicketData[];
-  ticketsIndexs: {
-    start: number;
-    end: number;
-  };
+  currentIdx: number;
 };
+
+interface TakeFiveArgs {
+  fiveTickets: TicketData[];
+  currentIdx: number;
+  stop: boolean;
+}
 
 const initialState: TicketsList = {
   renderedTickets: [],
-  ticketsIndexs: {
-    start: 0,
-    end: 5,
-  },
+  currentIdx: 0,
 };
 
 const ticketsListSlice = createSlice({
   name: 'tickets-list',
   initialState,
   reducers: {
-    fiveMore: (state, action: PayloadAction<TicketData[]>) => {
-      state.renderedTickets.push(...action.payload);
-      state.ticketsIndexs = {
-        start: state.ticketsIndexs.start + 5,
-        end: state.ticketsIndexs.end + 5,
-      };
+    takeFive: (state, action: PayloadAction<TakeFiveArgs>) => {
+      if (action.payload.stop) {
+        state.renderedTickets = action.payload.fiveTickets;
+        state.currentIdx = action.payload.currentIdx;
+      } else {
+        state.renderedTickets = action.payload.fiveTickets;
+      }
+    },
+    fiveMore: (state, action: PayloadAction<TakeFiveArgs>) => {
+      state.renderedTickets.push(...action.payload.fiveTickets);
+      state.currentIdx = action.payload.currentIdx;
     },
   },
 });
 
-export const { fiveMore } = ticketsListSlice.actions;
+export const { takeFive, fiveMore } = ticketsListSlice.actions;
 
 export default ticketsListSlice;

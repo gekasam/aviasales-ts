@@ -10,7 +10,7 @@ module.exports = {
     'plugin:react/recommended',
     'plugin:react-hooks/recommended',
     'plugin:jsx-a11y/recommended',
-    'plugin:import/recommended',
+    /* 'plugin:import/recommended', */
     'prettier',
   ],
   ignorePatterns: ['dist', '.eslintrc.cjs', 'node_modules', 'build', 'vite.config.ts'],
@@ -25,14 +25,14 @@ module.exports = {
   },
   plugins: ['react-refresh', 'react', 'jsx-a11y', 'prettier', 'import'],
   rules: {
+    'no-plusplus' : ['error', { 'allowForLoopAfterthoughts': true }],
     'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
     indent: ['error', 2],
     'linebreak-style': [0, 'windows'],
-    quotes: ['error', 'single'],
-    semi: ['error', 'always'],
     'react/react-in-jsx-scope': 'off',
     'react/prop-types': 0,
     'import/no-absolute-path': 'off',
+    "indent": "off",
     'import/no-unresolved': [2, { caseSensitive: false }],
     'react/jsx-filename-extension': [1, { extensions: ['.js', '.jsx'] }],
     'jsx-a11y/label-has-associated-control': [
