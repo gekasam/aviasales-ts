@@ -5,6 +5,7 @@ import { cheap, fast, optimal } from '../../store/sortSlice';
 
 import classes from './SortButtonsList.module.scss';
 
+console.log('y');
 export default function SortButtonsList() {
   const sort = useAppSelector((state) => state.sortReducer.sortValue);
   const dispatch = useAppDispatch();
