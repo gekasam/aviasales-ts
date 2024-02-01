@@ -30,7 +30,10 @@ export default function SortButtonsList() {
         <button
           type="button"
           className={buttonSortClasses('fast')}
-          onClick={() => dispatch(fast())}
+          onClick={() => {
+            console.time('sortTimer');
+            dispatch(fast());
+          }}
         >
           САМЫЙ БЫСТРЫЙ
         </button>

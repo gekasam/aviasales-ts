@@ -10,7 +10,7 @@ module.exports = {
     'plugin:react/recommended',
     'plugin:react-hooks/recommended',
     'plugin:jsx-a11y/recommended',
-    'plugin:import/recommended',
+    /* 'plugin:import/recommended', */
     'prettier',
   ],
   ignorePatterns: ['dist', '.eslintrc.cjs', 'node_modules', 'build', 'vite.config.ts'],
@@ -23,7 +23,7 @@ module.exports = {
     ecmaVersion: 'latest',
     sourceType: 'module',
   },
-  plugins: ['react-refresh', 'react', 'jsx-a11y', 'prettier', 'import'],
+  plugins: ['react-refresh', 'react', 'jsx-a11y', /* 'prettier', */ 'import'],
   rules: {
     'no-plusplus' : ['error', { 'allowForLoopAfterthoughts': true }],
     'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
