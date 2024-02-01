@@ -91,6 +91,7 @@ export default function AviasalesApp() {
 
   useEffect(() => {
     if (storeFetch.tickets.length > 0 && !storeFetch.loading) {
+      console.timeEnd('sortTimer');
       takeFirstFive();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
