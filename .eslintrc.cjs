@@ -10,7 +10,7 @@ module.exports = {
     'plugin:react/recommended',
     'plugin:react-hooks/recommended',
     'plugin:jsx-a11y/recommended',
-    /* 'plugin:import/recommended', */
+    'plugin:import/recommended',
     'prettier',
   ],
   ignorePatterns: ['dist', '.eslintrc.cjs', 'node_modules', 'build', 'vite.config.ts'],
