@@ -1,5 +1,6 @@
 /* eslint-disable no-continue */
 import { useEffect } from 'react';
+import { Spin, ConfigProvider } from 'antd';
 
 import SortButtonsList from '../SortButtonsList';
 import TicketList from '../TicketList';
@@ -15,7 +16,7 @@ import logo from '/src/assets/images/Logo.svg';
 import classes from './AviasalesApp.module.scss';
 
 export default function AviasalesApp() {
-  const storeSort = useAppSelector((state) => state.sortReducer);
+  const storeSort = useAppSelector((state) => state.fetchReducer.sortState);
   const storeFilter = useAppSelector((state) => state.filterReducer);
   const storeFetch = useAppSelector((state) => state.fetchReducer);
   const storeTicketsList = useAppSelector((state) => state.ticketListReducer);
@@ -23,41 +24,83 @@ export default function AviasalesApp() {
   const ticketsLimit = 5;
 
   function takeFiveTickets(): { fiveTickets: TicketData[]; currentIdx: number; stop: boolean } {
+    // console.log('START TAKEFIVE');
     const fiveTickets = [];
     let newCurrentIdx = storeTicketsList.currentIdx;
 
-    for (let i = storeTicketsList.currentIdx; i < ticketsLimit; ) {
-      const oneWayStopsNumber = storeFetch.tickets[i].segments[0].stops.length;
-      const returnStopsNumber = storeFetch.tickets[i].segments[1].stops.length;
-      newCurrentIdx += 1;
-
-      if (storeFilter.without && (oneWayStopsNumber === 0 || returnStopsNumber === 0)) {
-        fiveTickets.push(storeFetch.tickets[i]);
-        i += 1;
-        continue;
-      }
-      if (storeFilter.one && (oneWayStopsNumber === 1 || returnStopsNumber === 1)) {
-        fiveTickets.push(storeFetch.tickets[i]);
-        i += 1;
-        continue;
-      }
-      if (storeFilter.two && (oneWayStopsNumber === 2 || returnStopsNumber === 2)) {
-        fiveTickets.push(storeFetch.tickets[i]);
-        i += 1;
-        continue;
-      }
-      if (storeFilter.three && (oneWayStopsNumber === 3 || returnStopsNumber === 3)) {
-        fiveTickets.push(storeFetch.tickets[i]);
-        i += 1;
-        continue;
-      }
-      if (!storeFilter.without && !storeFilter.one && !storeFilter.two && !storeFilter.three) {
-        fiveTickets.push(storeFetch.tickets[i]);
-        i += 1;
-        continue;
-      }
+    if (
+      storeSort.sortValue !== storeSort.prevSortValue ||
+      storeFilter.currentSum !== storeFilter.prevSum
+    ) {
+      newCurrentIdx = 0;
     }
 
+    for (let i = 0; i < ticketsLimit; ) {
+      // console.log('START CYCLE');
+      const oneWayStopsNumber = storeFetch.tickets[newCurrentIdx].segments[0].stops.length;
+      const returnStopsNumber = storeFetch.tickets[newCurrentIdx].segments[1].stops.length;
+      const maxStops = Math.max(oneWayStopsNumber, returnStopsNumber);
+
+      if (maxStops === 0) {
+        // console.log(
+        //   `oneWayStopsNumber: ${oneWayStopsNumber}|, returnStopsNumber: ${returnStopsNumber}|, maxStops: ${maxStops}, === 0|, filter without: ${storeFilter.without}|, ${JSON.stringify(storeFetch.tickets[i])}|`
+        // );
+        if (storeFilter.without) {
+          // console.log(`imHere, without, ${storeFetch.tickets[i].price}`);
+          fiveTickets.push(storeFetch.tickets[newCurrentIdx]);
+          i += 1;
+          newCurrentIdx += 1;
+          continue;
+        }
+      }
+      if (maxStops === 1) {
+        // console.log(
+        //   `oneWayStopsNumber: ${oneWayStopsNumber}|, returnStopsNumber: ${returnStopsNumber}|, maxStops: ${maxStops}|, === 1, filter one: ${storeFilter.one}|, ${JSON.stringify(storeFetch.tickets[i])}|`
+        // );
+        if (storeFilter.one) {
+          // console.log(`imHere, one, ${storeFetch.tickets[i].price}`);
+          fiveTickets.push(storeFetch.tickets[newCurrentIdx]);
+          i += 1;
+          newCurrentIdx += 1;
+          continue;
+        }
+      }
+      if (maxStops === 2) {
+        // console.log(
+        //   `oneWayStopsNumber: ${oneWayStopsNumber}|, returnStopsNumber: ${returnStopsNumber}|, maxStops: ${maxStops}|, === 2, filter two: ${storeFilter.two}|, ${JSON.stringify(storeFetch.tickets[i])}|`
+        // );
+        if (storeFilter.two) {
+          // console.log(`imHere, two, ${storeFetch.tickets[i].price}`);
+          fiveTickets.push(storeFetch.tickets[newCurrentIdx]);
+          i += 1;
+          newCurrentIdx += 1;
+          continue;
+        }
+      }
+      if (maxStops === 3) {
+        // console.log(
+        //   `oneWayStopsNumber: ${oneWayStopsNumber}|, returnStopsNumber: ${returnStopsNumber}|, maxStops: ${maxStops}, === 3|, filter three: ${storeFilter.three}|, ${JSON.stringify(storeFetch.tickets[i])}|`
+        // );
+        if (storeFilter.three) {
+          // console.log(`imHere, three, ${storeFetch.tickets[i].price}`);
+          fiveTickets.push(storeFetch.tickets[newCurrentIdx]);
+          i += 1;
+          newCurrentIdx += 1;
+          continue;
+        }
+      }
+      if (!storeFilter.without && !storeFilter.one && !storeFilter.two && !storeFilter.three) {
+        // console.log(`maxStops ${maxStops}, nothingChange`);
+        fiveTickets.push(storeFetch.tickets[newCurrentIdx]);
+        i += 1;
+        newCurrentIdx += 1;
+        continue;
+      }
+      newCurrentIdx += 1;
+      // console.log('END CYCLE');
+    }
+
+    // console.log('END TAKEFIVE');
     return {
       fiveTickets,
       currentIdx: newCurrentIdx,
@@ -91,11 +134,10 @@ export default function AviasalesApp() {
 
   useEffect(() => {
     if (storeFetch.tickets.length > 0 && !storeFetch.loading) {
-      console.timeEnd('sortTimer');
       takeFirstFive();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [storeFetch.tickets, storeFetch.loading]);
+  }, [storeFetch.tickets, storeFetch.loading, storeFilter]);
 
   return (
     <div className={classes['app-wrapper']}>
@@ -104,13 +146,30 @@ export default function AviasalesApp() {
           <a href="aviasales">
             <img className={classes.logo} src={logo} alt="logo and link go to aviasales" />
           </a>
+          {storeFetch.loading && <Spin className={classes['app-header__spinner']} />}
         </header>
         <main className={classes.content}>
           <section className={classes['tickets-section']}>
             <SortButtonsList />
             <TicketList />
-            <button className={classes['button-more']} type="button" onClick={() => takeFiveMore()}>
-              ПОКАЗАТЬ ЕЩЕ 5 БИЛЕТОВ
+            <button
+              className={classes['button-more']}
+              type="button"
+              onClick={() => !storeFetch.loading && takeFiveMore()}
+            >
+              {storeFetch.loading ? (
+                <ConfigProvider
+                  theme={{
+                    token: {
+                      colorPrimary: '#ffffff',
+                    },
+                  }}
+                >
+                  <Spin />
+                </ConfigProvider>
+              ) : (
+                'ПОКАЗАТЬ ЕЩЕ 5 БИЛЕТОВ'
+              )}
             </button>
           </section>
           <aside className={classes.filter}>

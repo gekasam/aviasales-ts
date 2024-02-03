@@ -1,13 +1,12 @@
 import classNames from 'classnames';
 
 import { useAppSelector, useAppDispatch } from '../../hooks';
-import { cheap, fast, optimal } from '../../store/sortSlice';
+import { cheap, fast, optimal } from '../../store/fetchSlice';
 
 import classes from './SortButtonsList.module.scss';
 
-console.log('y');
 export default function SortButtonsList() {
-  const sort = useAppSelector((state) => state.sortReducer.sortValue);
+  const sort = useAppSelector((state) => state.fetchReducer.sortState.sortValue);
   const dispatch = useAppDispatch();
 
   const buttonSortClasses = (value: string) =>
@@ -22,7 +21,7 @@ export default function SortButtonsList() {
           type="button"
           value="cheap"
           className={buttonSortClasses('cheap')}
-          onClick={() => dispatch(cheap())}
+          onClick={() => dispatch(cheap(sort))}
         >
           САМЫЙ ДЕШЁВЫЙ
         </button>
@@ -32,8 +31,7 @@ export default function SortButtonsList() {
           type="button"
           className={buttonSortClasses('fast')}
           onClick={() => {
-            console.time('sortTimer');
-            dispatch(fast());
+            dispatch(fast(sort));
           }}
         >
           САМЫЙ БЫСТРЫЙ
@@ -43,7 +41,7 @@ export default function SortButtonsList() {
         <button
           type="button"
           className={buttonSortClasses('optimal')}
-          onClick={() => dispatch(optimal())}
+          onClick={() => dispatch(optimal(sort))}
         >
           ОПТИМАЛНЫЙ
         </button>

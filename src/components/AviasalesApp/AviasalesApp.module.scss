@@ -17,6 +17,9 @@
 }
 
 .app-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   padding: 5rem 0 5rem 0;
 }
 
@@ -52,4 +55,32 @@
 
 .button-more:hover {
   background-color: #249cff;
+}
+
+span i .ant-spin-dot-item {
+  background-color: #ffffff !important;
+}
+
+@media (max-width: 55em) {
+  .app {
+    padding: 0 3rem 0 3rem;
+  }
+  .app-header {
+    padding: 1rem 0 2rem 0;
+  }
+  .app-header__spinner {
+    position: absolute;
+    top: 6.5rem;
+  }
+  .content {
+    flex-direction: column-reverse;
+    align-items: center;
+    gap: 1rem;
+  }
+  .filter {
+    width: 100%;
+  }
+  .tickets-section {
+    width: 100%;
+  }
 }

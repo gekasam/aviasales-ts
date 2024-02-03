@@ -33,3 +33,9 @@
 .button-sort--active:hover {
   background-color: #249cff;
 }
+
+@media (max-width: 55em) {
+  .button-sort {
+    padding: 0 0.5rem 0 0.5rem;
+  }
+}

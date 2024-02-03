@@ -4,12 +4,18 @@ import type { TicketData } from '../components/Ticket/Ticket';
 
 type Tickets = TicketData[];
 
-type ExternalData = {
+type SortData = {
+  sortValue: string;
+  prevSortValue: string;
+};
+
+type FetchData = {
   searchId: string;
   tickets: Tickets;
   stop: boolean;
   loading: boolean;
   error: string | null;
+  sortState: SortData;
 };
 
 export const fetchSearchId = createAsyncThunk<string, undefined, { rejectValue: string }>(
@@ -56,24 +62,28 @@ export const fetchTickets = createAsyncThunk<
     data.sortValue = sortValue;
     return data;
   }
-  // (_, { rejectWithValue }) =>
-  //   fetch('https://aviasales-test-api.kata.academy/search')
-  //     .then((response) => {
-  //       if (response.status !== 200) {
-  //         throw new Error(`Server Error ${response.status}`);
-  //       }
-  //       return response.json();
-  //     })
-  //     .then((data) => data.searchId)
-  //     .catch((error) => rejectWithValue(`My custom error, error message: ${error.message}`))
+  /*   (_, { rejectWithValue }) =>
+    fetch('https://aviasales-test-api.kata.academy/search')
+      .then((response) => {
+        if (response.status !== 200) {
+          throw new Error(`Server Error ${response.status}`);
+        }
+        return response.json();
+      })
+      .then((data) => data.searchId)
+      .catch((error) => rejectWithValue(`My custom error, error message: ${error.message}`)) */
 );
 
-const initialState: ExternalData = {
+const initialState: FetchData = {
   searchId: '',
   tickets: [],
   stop: false,
   loading: false,
   error: null,
+  sortState: {
+    sortValue: 'cheap',
+    prevSortValue: 'cheap',
+  },
 };
 
 function isError(action: Action) {
@@ -81,91 +91,117 @@ function isError(action: Action) {
 }
 
 export function sortCheap<T extends TicketData>(rawArray: T[]): T[] {
-  function merge(array1: T[], array2: T[]): T[] {
-    const merged: T[] = [];
-    let i: number = 0;
-    let j: number = 0;
-
-    const arr1Length = array1.length;
-    const arr2Length = array2.length;
-
-    while (i < arr1Length && j < arr2Length) {
-      if (array1[i].price < array2[j].price) {
-        merged.push(array1[i]);
-        i += 1;
-      } else {
-        merged.push(array2[j]);
-        j += 1;
-      }
-    }
-    while (i < arr1Length) {
-      merged.push(array1[i]);
-      i += 1;
-    }
-    while (j < arr2Length) {
-      merged.push(array2[j]);
-      j += 1;
-    }
-    return merged;
-  }
-
-  function mergeSort(array: T[]): T[] {
-    if (array.length <= 1) return array;
-
-    const mid = Math.floor(array.length / 2);
-    const left: T[] = mergeSort(array.slice(0, mid));
-    const right: T[] = mergeSort(array.slice(mid));
-
-    return merge(left, right);
-  }
-
-  return mergeSort(rawArray);
+  return rawArray.sort((a: T, b: T) => a.price - b.price);
 }
 
 export function sortFast<T extends TicketData>(rawArray: T[]): T[] {
-  function merge(array1: T[], array2: T[]): T[] {
-    const merged: T[] = [];
-    let i: number = 0;
-    let j: number = 0;
+  return rawArray.sort(
+    (a: T, b: T) =>
+      a.segments[0].duration +
+      a.segments[1].duration -
+      (b.segments[0].duration + b.segments[1].duration)
+  );
+}
 
-    const arr1Length = array1.length;
-    const arr2Length = array2.length;
+export function sortOptimal<T extends TicketData>(rawArray: T[]): T[] {
+  return rawArray.sort((a: T, b: T) => {
+    if (a.price !== b.price) {
+      return a.price - b.price;
+    }
+    return (
+      a.segments[0].duration +
+      a.segments[1].duration -
+      (b.segments[0].duration + b.segments[1].duration)
+    );
+  });
+}
 
-    while (i < arr1Length && j < arr2Length) {
-      if (
-        array1[i].segments[0].duration + array1[i].segments[1].duration <
-        array2[j].segments[0].duration + array2[j].segments[1].duration
-      ) {
+/* export function sortCheap<T extends TicketData>(rawArray: T[]): T[] {
+    function merge(array1: T[], array2: T[]): T[] {
+      const merged: T[] = [];
+      let i: number = 0;
+      let j: number = 0;
+
+      const arr1Length = array1.length;
+      const arr2Length = array2.length;
+
+      while (i < arr1Length && j < arr2Length) {
+        if (array1[i].price < array2[j].price) {
+          merged.push(array1[i]);
+          i += 1;
+        } else {
+          merged.push(array2[j]);
+          j += 1;
+        }
+      }
+      while (i < arr1Length) {
         merged.push(array1[i]);
         i += 1;
-      } else {
+      }
+      while (j < arr2Length) {
         merged.push(array2[j]);
         j += 1;
       }
+      return merged;
     }
-    while (i < arr1Length) {
-      merged.push(array1[i]);
-      i += 1;
+
+    function mergeSort(array: T[]): T[] {
+      if (array.length <= 1) return array;
+
+      const mid = Math.floor(array.length / 2);
+      const left: T[] = mergeSort(array.slice(0, mid));
+      const right: T[] = mergeSort(array.slice(mid));
+
+      return merge(left, right);
     }
-    while (j < arr2Length) {
-      merged.push(array2[j]);
-      j += 1;
-    }
-    return merged;
+
+    return mergeSort(rawArray);
   }
 
-  function mergeSort(array: T[]): T[] {
-    if (array.length <= 1) return array;
+  export function sortFast<T extends TicketData>(rawArray: T[]): T[] {
+    function merge(array1: T[], array2: T[]): T[] {
+      const merged: T[] = [];
+      let i: number = 0;
+      let j: number = 0;
 
-    const mid = Math.floor(array.length / 2);
-    const left: T[] = mergeSort(array.slice(0, mid));
-    const right: T[] = mergeSort(array.slice(mid));
+      const arr1Length = array1.length;
+      const arr2Length = array2.length;
 
-    return merge(left, right);
+      while (i < arr1Length && j < arr2Length) {
+        if (
+          array1[i].segments[0].duration + array1[i].segments[1].duration <
+          array2[j].segments[0].duration + array2[j].segments[1].duration
+        ) {
+          merged.push(array1[i]);
+          i += 1;
+        } else {
+          merged.push(array2[j]);
+          j += 1;
+        }
+      }
+      while (i < arr1Length) {
+        merged.push(array1[i]);
+        i += 1;
+      }
+      while (j < arr2Length) {
+        merged.push(array2[j]);
+        j += 1;
+      }
+      return merged;
+    }
+
+    function mergeSort(array: T[]): T[] {
+      if (array.length <= 1) return array;
+
+      const mid = Math.floor(array.length / 2);
+      const left: T[] = mergeSort(array.slice(0, mid));
+      const right: T[] = mergeSort(array.slice(mid));
+
+      return merge(left, right);
+    }
+
+    return mergeSort(rawArray);
   }
-
-  return mergeSort(rawArray);
-}
 
 export function sortOptimal<T extends TicketData>(rawArray: T[]): T[] {
   function merge(array1: T[], array2: T[]): T[] {
@@ -216,14 +252,28 @@ export function sortOptimal<T extends TicketData>(rawArray: T[]): T[] {
   }
 
   return mergeSort(rawArray);
-}
+} */
 
 const fetchSlice = createSlice({
   name: 'fetch',
   initialState,
   reducers: {
-    sort: (state, action: PayloadAction<string>) => {
+    cheap: (state, action) => {
       state.loading = true;
+      state.sortState.prevSortValue = action.payload;
+      state.sortState.sortValue = 'cheap';
+    },
+    fast: (state, action) => {
+      state.loading = true;
+      state.sortState.prevSortValue = action.payload;
+      state.sortState.sortValue = 'fast';
+    },
+    optimal: (state, action) => {
+      state.loading = true;
+      state.sortState.prevSortValue = action.payload;
+      state.sortState.sortValue = 'optimal';
+    },
+    sort: (state, action: PayloadAction<string>) => {
       if (action.payload === 'cheap') {
         state.tickets = sortCheap(state.tickets);
       } else if (action.payload === 'fast') {
@@ -269,6 +319,6 @@ const fetchSlice = createSlice({
   },
 });
 
-export const { sort } = fetchSlice.actions;
+export const { sort, cheap, fast, optimal } = fetchSlice.actions;
 
 export default fetchSlice;

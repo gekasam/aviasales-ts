@@ -1,24 +1,29 @@
-import { createSlice } from '@reduxjs/toolkit';
+/* import { createSlice } from '@reduxjs/toolkit';
 
 export type SortSlice = {
   sortValue: string;
+  prevSortValue: string;
 };
 
 const initialState: SortSlice = {
   sortValue: 'cheap',
+  prevSortValue: 'cheap',
 };
 
 const sortSlice = createSlice({
   name: 'sort',
   initialState,
   reducers: {
-    cheap: (state) => {
+    cheap: (state, action) => {
+      state.prevSortValue = action.payload;
       state.sortValue = 'cheap';
     },
-    fast: (state) => {
+    fast: (state, action) => {
+      state.prevSortValue = action.payload;
       state.sortValue = 'fast';
     },
-    optimal: (state) => {
+    optimal: (state, action) => {
+      state.prevSortValue = action.payload;
       state.sortValue = 'optimal';
     },
   },
@@ -27,3 +32,4 @@ const sortSlice = createSlice({
 export const { cheap, fast, optimal } = sortSlice.actions;
 
 export default sortSlice;
+ */
