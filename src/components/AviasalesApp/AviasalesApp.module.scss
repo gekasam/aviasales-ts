@@ -43,6 +43,11 @@
   width: 50.2rem;
 }
 
+.empty-list-notification {
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+}
+
 .button-more {
   @include button-reset;
   background-color: #2196F3;
@@ -55,6 +60,10 @@
 
 .button-more:hover {
   background-color: #249cff;
+}
+
+.button-more--disabled, .button-more--disabled:hover {
+  background-color: #808080;
 }
 
 span i .ant-spin-dot-item {

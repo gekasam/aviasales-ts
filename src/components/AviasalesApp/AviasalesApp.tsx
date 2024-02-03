@@ -1,4 +1,5 @@
 /* eslint-disable no-continue */
+import classNames from 'classnames';
 import { useEffect } from 'react';
 import { Spin, ConfigProvider } from 'antd';
 
@@ -91,10 +92,7 @@ export default function AviasalesApp() {
       }
       if (!storeFilter.without && !storeFilter.one && !storeFilter.two && !storeFilter.three) {
         // console.log(`maxStops ${maxStops}, nothingChange`);
-        fiveTickets.push(storeFetch.tickets[newCurrentIdx]);
-        i += 1;
-        newCurrentIdx += 1;
-        continue;
+        break;
       }
       newCurrentIdx += 1;
       // console.log('END CYCLE');
@@ -139,6 +137,31 @@ export default function AviasalesApp() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [storeFetch.tickets, storeFetch.loading, storeFilter]);
 
+  function getButtonContent() {
+    if (storeFetch.loading) {
+      return (
+        <ConfigProvider
+          theme={{
+            token: {
+              colorPrimary: '#ffffff',
+            },
+          }}
+        >
+          <Spin />
+        </ConfigProvider>
+      );
+    }
+    if (!storeTicketsList.renderedTickets.length) {
+      return '';
+    }
+    return 'ПОКАЗАТЬ ЕЩЕ 5 БИЛЕТОВ';
+  }
+
+  const buttonMoreClasses = classNames({
+    [classes['button-more']]: true,
+    [classes['button-more--disabled']]: !storeTicketsList.renderedTickets.length,
+  });
+
   return (
     <div className={classes['app-wrapper']}>
       <div className={classes.app}>
@@ -151,25 +174,19 @@ export default function AviasalesApp() {
         <main className={classes.content}>
           <section className={classes['tickets-section']}>
             <SortButtonsList />
-            <TicketList />
+            {!storeTicketsList.renderedTickets.length ? (
+              <h2 className={classes['empty-list-notification']}>
+                Рейсов, подходящих под заданные фильтры, не найдено
+              </h2>
+            ) : (
+              <TicketList />
+            )}
             <button
-              className={classes['button-more']}
+              className={buttonMoreClasses}
               type="button"
               onClick={() => !storeFetch.loading && takeFiveMore()}
             >
-              {storeFetch.loading ? (
-                <ConfigProvider
-                  theme={{
-                    token: {
-                      colorPrimary: '#ffffff',
-                    },
-                  }}
-                >
-                  <Spin />
-                </ConfigProvider>
-              ) : (
-                'ПОКАЗАТЬ ЕЩЕ 5 БИЛЕТОВ'
-              )}
+              {getButtonContent()}
             </button>
           </section>
           <aside className={classes.filter}>
