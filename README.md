@@ -1,1 +1,1 @@
-https://aviasales-enfjdibi2-gekasam.vercel.app/
+https://aviasales-a3cg8n96t-gekasam.vercel.app
