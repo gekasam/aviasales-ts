@@ -27,6 +27,7 @@ export default function AviasalesApp() {
   function takeFiveTickets(): { fiveTickets: TicketData[]; currentIdx: number; stop: boolean } {
     // console.log('START TAKEFIVE');
     const fiveTickets = [];
+    const ticketsLength = storeFetch.tickets.length;
     let newCurrentIdx = storeTicketsList.currentIdx;
 
     if (
@@ -36,7 +37,7 @@ export default function AviasalesApp() {
       newCurrentIdx = 0;
     }
 
-    for (let i = 0; i < ticketsLimit; ) {
+    for (let i = 0; i < ticketsLimit && newCurrentIdx < ticketsLength; ) {
       // console.log('START CYCLE');
       const oneWayStopsNumber = storeFetch.tickets[newCurrentIdx].segments[0].stops.length;
       const returnStopsNumber = storeFetch.tickets[newCurrentIdx].segments[1].stops.length;

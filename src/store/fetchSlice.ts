@@ -2,6 +2,8 @@ import { createSlice, createAsyncThunk, Action, PayloadAction } from '@reduxjs/t
 
 import type { TicketData } from '../components/Ticket/Ticket';
 
+/* import arr from './mock'; */
+
 type Tickets = TicketData[];
 
 type SortData = {
@@ -259,19 +261,25 @@ const fetchSlice = createSlice({
   initialState,
   reducers: {
     cheap: (state, action) => {
-      state.loading = true;
-      state.sortState.prevSortValue = action.payload;
-      state.sortState.sortValue = 'cheap';
+      if (action.payload !== 'cheap') {
+        state.loading = true;
+        state.sortState.prevSortValue = action.payload;
+        state.sortState.sortValue = 'cheap';
+      }
     },
     fast: (state, action) => {
-      state.loading = true;
-      state.sortState.prevSortValue = action.payload;
-      state.sortState.sortValue = 'fast';
+      if (action.payload !== 'fast') {
+        state.loading = true;
+        state.sortState.prevSortValue = action.payload;
+        state.sortState.sortValue = 'fast';
+      }
     },
     optimal: (state, action) => {
-      state.loading = true;
-      state.sortState.prevSortValue = action.payload;
-      state.sortState.sortValue = 'optimal';
+      if (action.payload !== 'optimal') {
+        state.loading = true;
+        state.sortState.prevSortValue = action.payload;
+        state.sortState.sortValue = 'optimal';
+      }
     },
     sort: (state, action: PayloadAction<string>) => {
       if (action.payload === 'cheap') {

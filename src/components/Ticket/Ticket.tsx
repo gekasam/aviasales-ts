@@ -1,24 +1,17 @@
 import classes from './Ticket.module.scss';
 
+type Segment = {
+  origin: string;
+  destination: string;
+  date: string;
+  duration: number;
+  stops: string[];
+};
+
 export type TicketData = {
   price: number;
   carrier: string;
-  segments: {
-    0: {
-      origin: string;
-      destination: string;
-      date: string;
-      duration: number;
-      stops: string[];
-    };
-    1: {
-      origin: string;
-      destination: string;
-      date: string;
-      duration: number;
-      stops: string[];
-    };
-  };
+  segments: Segment[];
 };
 
 interface TicketProps {

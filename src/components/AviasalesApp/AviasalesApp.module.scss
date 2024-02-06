@@ -23,6 +23,11 @@
   padding: 5rem 0 5rem 0;
 }
 
+.app-header__spinner {
+  position: absolute;
+  top: 11.5rem;
+}
+
 .logo {
   width: 6rem;
   height: 6rem;
@@ -78,7 +83,6 @@ span i .ant-spin-dot-item {
     padding: 1rem 0 2rem 0;
   }
   .app-header__spinner {
-    position: absolute;
     top: 6.5rem;
   }
   .content {
