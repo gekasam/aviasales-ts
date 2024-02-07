@@ -1,4 +1,3 @@
-/* eslint-disable no-continue */
 import classNames from 'classnames';
 import { useEffect } from 'react';
 import { Spin, ConfigProvider } from 'antd';
@@ -7,9 +6,9 @@ import SortButtonsList from '../SortButtonsList';
 import TicketList from '../TicketList';
 import Filter from '../Filter';
 import { useAppDispatch, useAppSelector } from '../../hooks';
-import { fetchSearchId, fetchTickets, sort } from '../../store/fetchSlice';
+import { fetchSearchId, fetchTickets, /* sort, */ asyncSort } from '../../store/fetchSlice';
 import { fiveMore, takeFive } from '../../store/ticketsListSlice';
-import type { TicketData } from '../Ticket/Ticket';
+import takeFiveTickets from '../filterFunction/filterFunction';
 
 // eslint-disable-next-line import/no-unresolved
 import logo from '/src/assets/images/Logo.svg';
@@ -22,97 +21,13 @@ export default function AviasalesApp() {
   const storeFetch = useAppSelector((state) => state.fetchReducer);
   const storeTicketsList = useAppSelector((state) => state.ticketListReducer);
   const dispatch = useAppDispatch();
-  const ticketsLimit = 5;
-
-  function takeFiveTickets(): { fiveTickets: TicketData[]; currentIdx: number; stop: boolean } {
-    // console.log('START TAKEFIVE');
-    const fiveTickets = [];
-    const ticketsLength = storeFetch.tickets.length;
-    let newCurrentIdx = storeTicketsList.currentIdx;
-
-    if (
-      storeSort.sortValue !== storeSort.prevSortValue ||
-      storeFilter.currentSum !== storeFilter.prevSum
-    ) {
-      newCurrentIdx = 0;
-    }
-
-    for (let i = 0; i < ticketsLimit && newCurrentIdx < ticketsLength; ) {
-      // console.log('START CYCLE');
-      const oneWayStopsNumber = storeFetch.tickets[newCurrentIdx].segments[0].stops.length;
-      const returnStopsNumber = storeFetch.tickets[newCurrentIdx].segments[1].stops.length;
-      const maxStops = Math.max(oneWayStopsNumber, returnStopsNumber);
-
-      if (maxStops === 0) {
-        // console.log(
-        //   `oneWayStopsNumber: ${oneWayStopsNumber}|, returnStopsNumber: ${returnStopsNumber}|, maxStops: ${maxStops}, === 0|, filter without: ${storeFilter.without}|, ${JSON.stringify(storeFetch.tickets[i])}|`
-        // );
-        if (storeFilter.without) {
-          // console.log(`imHere, without, ${storeFetch.tickets[i].price}`);
-          fiveTickets.push(storeFetch.tickets[newCurrentIdx]);
-          i += 1;
-          newCurrentIdx += 1;
-          continue;
-        }
-      }
-      if (maxStops === 1) {
-        // console.log(
-        //   `oneWayStopsNumber: ${oneWayStopsNumber}|, returnStopsNumber: ${returnStopsNumber}|, maxStops: ${maxStops}|, === 1, filter one: ${storeFilter.one}|, ${JSON.stringify(storeFetch.tickets[i])}|`
-        // );
-        if (storeFilter.one) {
-          // console.log(`imHere, one, ${storeFetch.tickets[i].price}`);
-          fiveTickets.push(storeFetch.tickets[newCurrentIdx]);
-          i += 1;
-          newCurrentIdx += 1;
-          continue;
-        }
-      }
-      if (maxStops === 2) {
-        // console.log(
-        //   `oneWayStopsNumber: ${oneWayStopsNumber}|, returnStopsNumber: ${returnStopsNumber}|, maxStops: ${maxStops}|, === 2, filter two: ${storeFilter.two}|, ${JSON.stringify(storeFetch.tickets[i])}|`
-        // );
-        if (storeFilter.two) {
-          // console.log(`imHere, two, ${storeFetch.tickets[i].price}`);
-          fiveTickets.push(storeFetch.tickets[newCurrentIdx]);
-          i += 1;
-          newCurrentIdx += 1;
-          continue;
-        }
-      }
-      if (maxStops === 3) {
-        // console.log(
-        //   `oneWayStopsNumber: ${oneWayStopsNumber}|, returnStopsNumber: ${returnStopsNumber}|, maxStops: ${maxStops}, === 3|, filter three: ${storeFilter.three}|, ${JSON.stringify(storeFetch.tickets[i])}|`
-        // );
-        if (storeFilter.three) {
-          // console.log(`imHere, three, ${storeFetch.tickets[i].price}`);
-          fiveTickets.push(storeFetch.tickets[newCurrentIdx]);
-          i += 1;
-          newCurrentIdx += 1;
-          continue;
-        }
-      }
-      if (!storeFilter.without && !storeFilter.one && !storeFilter.two && !storeFilter.three) {
-        // console.log(`maxStops ${maxStops}, nothingChange`);
-        break;
-      }
-      newCurrentIdx += 1;
-      // console.log('END CYCLE');
-    }
-
-    // console.log('END TAKEFIVE');
-    return {
-      fiveTickets,
-      currentIdx: newCurrentIdx,
-      stop: storeFetch.stop,
-    };
-  }
 
   function takeFirstFive() {
-    dispatch(takeFive(takeFiveTickets()));
+    dispatch(takeFive(takeFiveTickets(false)));
   }
 
   function takeFiveMore() {
-    dispatch(fiveMore(takeFiveTickets()));
+    dispatch(fiveMore(takeFiveTickets(true)));
   }
 
   useEffect(() => {
@@ -126,9 +41,8 @@ export default function AviasalesApp() {
   }, [storeFetch.searchId, storeFetch.loading, storeFetch.stop, storeSort.sortValue, dispatch]);
 
   useEffect(() => {
-    setTimeout(() => {
-      dispatch(sort(storeSort.sortValue));
-    });
+    dispatch(asyncSort({ sortValue: storeSort.sortValue, tickets: storeFetch.tickets }));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [storeSort.sortValue, dispatch]);
 
   useEffect(() => {

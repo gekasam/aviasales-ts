@@ -8,7 +8,7 @@ export type TicketsList = {
 };
 
 interface TakeFiveArgs {
-  fiveTickets: TicketData[];
+  displayedTickets: TicketData[];
   currentIdx: number;
   stop: boolean;
 }
@@ -24,14 +24,14 @@ const ticketsListSlice = createSlice({
   reducers: {
     takeFive: (state, action: PayloadAction<TakeFiveArgs>) => {
       if (action.payload.stop) {
-        state.renderedTickets = action.payload.fiveTickets;
+        state.renderedTickets = action.payload.displayedTickets;
         state.currentIdx = action.payload.currentIdx;
       } else {
-        state.renderedTickets = action.payload.fiveTickets;
+        state.renderedTickets = action.payload.displayedTickets;
       }
     },
     fiveMore: (state, action: PayloadAction<TakeFiveArgs>) => {
-      state.renderedTickets.push(...action.payload.fiveTickets);
+      state.renderedTickets.push(...action.payload.displayedTickets);
       state.currentIdx = action.payload.currentIdx;
     },
   },

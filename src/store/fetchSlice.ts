@@ -92,11 +92,11 @@ function isError(action: Action) {
   return action.type.endsWith('rejected');
 }
 
-export function sortCheap<T extends TicketData>(rawArray: T[]): T[] {
+function sortCheap<T extends TicketData>(rawArray: T[]): T[] {
   return rawArray.sort((a: T, b: T) => a.price - b.price);
 }
 
-export function sortFast<T extends TicketData>(rawArray: T[]): T[] {
+function sortFast<T extends TicketData>(rawArray: T[]): T[] {
   return rawArray.sort(
     (a: T, b: T) =>
       a.segments[0].duration +
@@ -105,7 +105,7 @@ export function sortFast<T extends TicketData>(rawArray: T[]): T[] {
   );
 }
 
-export function sortOptimal<T extends TicketData>(rawArray: T[]): T[] {
+function sortOptimal<T extends TicketData>(rawArray: T[]): T[] {
   return rawArray.sort((a: T, b: T) => {
     if (a.price !== b.price) {
       return a.price - b.price;
@@ -118,143 +118,38 @@ export function sortOptimal<T extends TicketData>(rawArray: T[]): T[] {
   });
 }
 
-/* export function sortCheap<T extends TicketData>(rawArray: T[]): T[] {
-    function merge(array1: T[], array2: T[]): T[] {
-      const merged: T[] = [];
-      let i: number = 0;
-      let j: number = 0;
+type SortParams = {
+  sortValue: string;
+  tickets: TicketData[];
+};
 
-      const arr1Length = array1.length;
-      const arr2Length = array2.length;
-
-      while (i < arr1Length && j < arr2Length) {
-        if (array1[i].price < array2[j].price) {
-          merged.push(array1[i]);
-          i += 1;
-        } else {
-          merged.push(array2[j]);
-          j += 1;
-        }
-      }
-      while (i < arr1Length) {
-        merged.push(array1[i]);
-        i += 1;
-      }
-      while (j < arr2Length) {
-        merged.push(array2[j]);
-        j += 1;
-      }
-      return merged;
+export const asyncSort = createAsyncThunk<TicketData[], SortParams>(
+  'fetch/sort',
+  async (params) => {
+    if (params.sortValue === 'cheap') {
+      const result = await new Promise<TicketData[]>((resolve) => {
+        setTimeout(() => {
+          resolve(sortCheap([...params.tickets]));
+        });
+      });
+      return result;
     }
-
-    function mergeSort(array: T[]): T[] {
-      if (array.length <= 1) return array;
-
-      const mid = Math.floor(array.length / 2);
-      const left: T[] = mergeSort(array.slice(0, mid));
-      const right: T[] = mergeSort(array.slice(mid));
-
-      return merge(left, right);
+    if (params.sortValue === 'fast') {
+      const result = await new Promise<TicketData[]>((resolve) => {
+        setTimeout(() => {
+          resolve(sortFast([...params.tickets]));
+        });
+      });
+      return result;
     }
-
-    return mergeSort(rawArray);
+    const result = await new Promise<TicketData[]>((resolve) => {
+      setTimeout(() => {
+        resolve(sortOptimal([...params.tickets]));
+      });
+    });
+    return result;
   }
-
-  export function sortFast<T extends TicketData>(rawArray: T[]): T[] {
-    function merge(array1: T[], array2: T[]): T[] {
-      const merged: T[] = [];
-      let i: number = 0;
-      let j: number = 0;
-
-      const arr1Length = array1.length;
-      const arr2Length = array2.length;
-
-      while (i < arr1Length && j < arr2Length) {
-        if (
-          array1[i].segments[0].duration + array1[i].segments[1].duration <
-          array2[j].segments[0].duration + array2[j].segments[1].duration
-        ) {
-          merged.push(array1[i]);
-          i += 1;
-        } else {
-          merged.push(array2[j]);
-          j += 1;
-        }
-      }
-      while (i < arr1Length) {
-        merged.push(array1[i]);
-        i += 1;
-      }
-      while (j < arr2Length) {
-        merged.push(array2[j]);
-        j += 1;
-      }
-      return merged;
-    }
-
-    function mergeSort(array: T[]): T[] {
-      if (array.length <= 1) return array;
-
-      const mid = Math.floor(array.length / 2);
-      const left: T[] = mergeSort(array.slice(0, mid));
-      const right: T[] = mergeSort(array.slice(mid));
-
-      return merge(left, right);
-    }
-
-    return mergeSort(rawArray);
-  }
-
-export function sortOptimal<T extends TicketData>(rawArray: T[]): T[] {
-  function merge(array1: T[], array2: T[]): T[] {
-    const merged: T[] = [];
-    let i: number = 0;
-    let j: number = 0;
-
-    const arr1Length = array1.length;
-    const arr2Length = array2.length;
-
-    while (i < arr1Length && j < arr2Length) {
-      if (array1[i].price < array2[j].price) {
-        merged.push(array1[i]);
-        i += 1;
-      } else if (array1[i].price > array2[j].price) {
-        merged.push(array2[j]);
-        j += 1;
-      } else if (
-        array1[i].segments[0].duration + array1[i].segments[1].duration <
-        array2[j].segments[0].duration + array2[j].segments[1].duration
-      ) {
-        merged.push(array1[i]);
-        i += 1;
-      } else {
-        merged.push(array2[j]);
-        j += 1;
-      }
-    }
-    while (i < arr1Length) {
-      merged.push(array1[i]);
-      i += 1;
-    }
-    while (j < arr2Length) {
-      merged.push(array2[j]);
-      j += 1;
-    }
-    return merged;
-  }
-
-  function mergeSort(array: T[]): T[] {
-    if (array.length <= 1) return array;
-
-    const mid = Math.floor(array.length / 2);
-    const left: T[] = mergeSort(array.slice(0, mid));
-    const right: T[] = mergeSort(array.slice(mid));
-
-    return merge(left, right);
-  }
-
-  return mergeSort(rawArray);
-} */
+);
 
 const fetchSlice = createSlice({
   name: 'fetch',
@@ -280,7 +175,7 @@ const fetchSlice = createSlice({
         state.sortState.prevSortValue = action.payload;
         state.sortState.sortValue = 'optimal';
       }
-    },
+    } /* ,
     sort: (state, action: PayloadAction<string>) => {
       if (action.payload === 'cheap') {
         state.tickets = sortCheap(state.tickets);
@@ -290,10 +185,17 @@ const fetchSlice = createSlice({
         state.tickets = sortOptimal(state.tickets);
       }
       state.loading = false;
-    },
+    }, */,
   },
   extraReducers: (builder) => {
     builder
+      .addCase(asyncSort.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(asyncSort.fulfilled, (state, action) => {
+        state.tickets = action.payload;
+        state.loading = false;
+      })
       .addCase(fetchSearchId.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -327,6 +229,6 @@ const fetchSlice = createSlice({
   },
 });
 
-export const { sort, cheap, fast, optimal } = fetchSlice.actions;
+export const { /* sort, */ cheap, fast, optimal } = fetchSlice.actions;
 
 export default fetchSlice;
