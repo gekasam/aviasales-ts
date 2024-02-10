@@ -16,7 +16,7 @@ import logo from '/src/assets/images/Logo.svg';
 import classes from './AviasalesApp.module.scss';
 
 export default function AviasalesApp() {
-  const storeSort = useAppSelector((state) => state.fetchReducer.sortState);
+  const storeSort = useAppSelector((state) => state.fetchReducer.sortValue);
   const storeFilter = useAppSelector((state) => state.filterReducer);
   const storeFetch = useAppSelector((state) => state.fetchReducer);
   const storeTicketsList = useAppSelector((state) => state.ticketListReducer);
@@ -36,14 +36,14 @@ export default function AviasalesApp() {
 
   useEffect(() => {
     if (storeFetch.searchId && !storeFetch.loading && !storeFetch.stop) {
-      dispatch(fetchTickets({ id: storeFetch.searchId, sortValue: storeSort.sortValue }));
+      dispatch(fetchTickets(storeFetch.searchId));
     }
-  }, [storeFetch.searchId, storeFetch.loading, storeFetch.stop, storeSort.sortValue, dispatch]);
+  }, [storeFetch.searchId, storeFetch.loading, storeFetch.stop, storeSort, dispatch]);
 
   useEffect(() => {
-    dispatch(asyncSort({ sortValue: storeSort.sortValue, tickets: storeFetch.tickets }));
+    dispatch(asyncSort({ sortValue: storeSort, tickets: storeFetch.tickets }));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [storeSort.sortValue, dispatch]);
+  }, [storeSort, dispatch]);
 
   useEffect(() => {
     if (storeFetch.tickets.length > 0 && !storeFetch.loading) {

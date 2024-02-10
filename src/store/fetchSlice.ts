@@ -6,10 +6,7 @@ import type { TicketData } from '../components/Ticket/Ticket';
 
 type Tickets = TicketData[];
 
-type SortData = {
-  sortValue: string;
-  prevSortValue: string;
-};
+type SortValue = 'cheap' | 'fast' | 'optimal';
 
 type FetchData = {
   searchId: string;
@@ -17,7 +14,7 @@ type FetchData = {
   stop: boolean;
   loading: boolean;
   error: string | null;
-  sortState: SortData;
+  sortValue: SortValue;
 };
 
 export const fetchSearchId = createAsyncThunk<string, undefined, { rejectValue: string }>(
@@ -32,49 +29,20 @@ export const fetchSearchId = createAsyncThunk<string, undefined, { rejectValue: 
       })
       .then((data) => data.searchId)
       .catch((error) => rejectWithValue(`My custom error, error message: ${error.message}`))
-
-  // async (_, {rejectWithValue}) => {
-  //   const response = await fetch('https://aviasales-test-api.ata.academy/searchs');
-  //   console.log('yo');
-  //   if (response.status !== 200) {
-  //     return rejectWithValue('HuYo');
-  //   }
-  //   const data = await response.json();
-  //   return data.searchId;
-  // }
 );
-
-interface Params {
-  id: string;
-  sortValue: string;
-}
 
 export const fetchTickets = createAsyncThunk<
-  { tickets: []; stop: boolean; sortValue: string },
-  Params,
+  { tickets: Tickets; stop: boolean },
+  string,
   { rejectValue: string }
->(
-  'fetch/tickets',
-  async ({ id, sortValue }, { rejectWithValue }) => {
-    const response = await fetch(`https://aviasales-test-api.kata.academy/tickets?searchId=${id}`);
-    if (response.status !== 200) {
-      return rejectWithValue(`Server Error ${response.status}`);
-    }
-    const data = await response.json();
-    data.sortValue = sortValue;
-    return data;
+>('fetch/tickets', async (id, { rejectWithValue }) => {
+  const response = await fetch(`https://aviasales-test-api.kata.academy/tickets?searchId=${id}`);
+  if (response.status !== 200) {
+    return rejectWithValue(`Server Error ${response.status}`);
   }
-  /*   (_, { rejectWithValue }) =>
-    fetch('https://aviasales-test-api.kata.academy/search')
-      .then((response) => {
-        if (response.status !== 200) {
-          throw new Error(`Server Error ${response.status}`);
-        }
-        return response.json();
-      })
-      .then((data) => data.searchId)
-      .catch((error) => rejectWithValue(`My custom error, error message: ${error.message}`)) */
-);
+  const data = await response.json();
+  return data;
+});
 
 const initialState: FetchData = {
   searchId: '',
@@ -82,10 +50,7 @@ const initialState: FetchData = {
   stop: false,
   loading: false,
   error: null,
-  sortState: {
-    sortValue: 'cheap',
-    prevSortValue: 'cheap',
-  },
+  sortValue: 'cheap',
 };
 
 function isError(action: Action) {
@@ -119,7 +84,7 @@ function sortOptimal<T extends TicketData>(rawArray: T[]): T[] {
 }
 
 type SortParams = {
-  sortValue: string;
+  sortValue: SortValue;
   tickets: TicketData[];
 };
 
@@ -158,22 +123,19 @@ const fetchSlice = createSlice({
     cheap: (state, action) => {
       if (action.payload !== 'cheap') {
         state.loading = true;
-        state.sortState.prevSortValue = action.payload;
-        state.sortState.sortValue = 'cheap';
+        state.sortValue = 'cheap';
       }
     },
     fast: (state, action) => {
       if (action.payload !== 'fast') {
         state.loading = true;
-        state.sortState.prevSortValue = action.payload;
-        state.sortState.sortValue = 'fast';
+        state.sortValue = 'fast';
       }
     },
     optimal: (state, action) => {
       if (action.payload !== 'optimal') {
         state.loading = true;
-        state.sortState.prevSortValue = action.payload;
-        state.sortState.sortValue = 'optimal';
+        state.sortValue = 'optimal';
       }
     } /* ,
     sort: (state, action: PayloadAction<string>) => {
@@ -212,9 +174,9 @@ const fetchSlice = createSlice({
       .addCase(fetchTickets.fulfilled, (state, action) => {
         state.tickets.push(...action.payload.tickets);
         state.stop = action.payload.stop;
-        if (action.payload.sortValue === 'cheap') {
+        if (state.sortValue === 'cheap') {
           state.tickets = sortCheap(state.tickets);
-        } else if (action.payload.sortValue === 'fast') {
+        } else if (state.sortValue === 'fast') {
           state.tickets = sortFast(state.tickets);
         } else {
           state.tickets = sortOptimal(state.tickets);
