@@ -38,6 +38,7 @@ export default function takeFiveTickets(more: boolean): {
       displayedTickets.push(storeFetch.tickets[newCurrentIdx]);
       i += 1;
       newCurrentIdx += 1;
+      continue;
     }
     if (maxStops === 1 && storeFilter.one) {
       displayedTickets.push(storeFetch.tickets[newCurrentIdx]);
